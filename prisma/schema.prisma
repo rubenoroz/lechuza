@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuario (extendido del base de NextAuth.js o similar)
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String?   // Para autenticación con credenciales
+  name            String?
+  image           String?
+  role            Role      @default(STUDENT) // Administrador, Instructor, Alumno
+
+  // Campos adicionales del modelo de Usuario
+  nombre_completo String?
+  foto_perfil     String?
+  biografia       String?
+  numero_matricula String?   @unique
+
+  // Relaciones
+  coursesEnrolled Enrollment[] // Cursos a los que el alumno está inscrito
+  coursesCreated  Course[]     @relation("InstructorCourses") // Cursos creados por este instructor
+
+  // Para el progreso del curso (JSON)
+  progreso_cursos Json? // { "curso_slug": { "modulo_1": ["clase_1_1"], ... } }
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+// Modelo de Curso
+model Course {
+  id                 String     @id @default(cuid())
+  titulo             String
+  slug               String     @unique
+  descripcion_corta  String
+  descripcion_larga  String
+  imagen_portada     String?
+  video_presentacion String?
+  modalidad          Modalidad
+  nivel              Nivel
+  publico_objetivo   PublicoObjetivo
+  precio             Float
+  activo             Boolean    @default(true)
+
+  // Relaciones
+  instructorId       String
+  instructor         User       @relation("InstructorCourses", fields: [instructorId], references: [id])
+  enrollments        Enrollment[] // Alumnos inscritos en este curso
+
+  modulos            Module[]
+  recursos_generales Resource[] @relation("CourseResources")
+
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+enum Modalidad {
+  OnlineGrabado
+  OnlineEnVivo
+  Presencial
+  Hibrido
+}
+
+enum Nivel {
+  Basico
+  Intermedio
+  Avanzado
+}
+
+enum PublicoObjetivo {
+  Profesionales
+  Ninos
+  General
+}
+
+// Modelo de Módulo (relacionado con Curso)
+model Module {
+  id        String   @id @default(cuid())
+  titulo    String
+  order     Int      @default(0)
+
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  clases    Class[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Modelo de Clase (relacionado con Módulo)
+model Class {
+  id               String         @id @default(cuid())
+  titulo           String
+  tipo_contenido   TipoContenido
+  contenido_video  String?
+  contenido_texto  String?
+  order            Int            @default(0)
+
+  moduleId         String
+  module           Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  quizId           String?
+  quiz             Quiz?          @relation(fields: [quizId], references: [id])
+  exerciseId       String?
+  exercise         Exercise?      @relation(fields: [exerciseId], references: [id]) // Relación con el nuevo modelo Exercise
+  recursos_clase   Resource[]     @relation("ClassResources")
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+enum TipoContenido {
+  Video
+  Texto
+  Quiz
+  Ejercicio
+}
+
+// Modelo Ejercicio (ahora es un modelo regular)
+model Exercise {
+  id            String   @id @default(cuid())
+  instrucciones String
+  // Podríamos añadir más campos aquí si los ejercicios son complejos
+  class         Class[] // Relación inversa con Class
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Modelo de Quiz (Colección independiente)
+model Quiz {
+  id        String     @id @default(cuid())
+  titulo    String
+  classes   Class[] // Clases que usan este quiz
+  preguntas Question[]
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+// Modelo de Pregunta (relacionado con Quiz)
+model Question {
+  id        String   @id @default(cuid())
+  texto     String
+  order     Int      @default(0)
+
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  opciones  Option[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Modelo de Opción (relacionado con Pregunta)
+model Option {
+  id          String   @id @default(cuid())
+  texto       String
+  es_correcta Boolean  @default(false)
+
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Modelo de Recurso (para recursos generales del curso o de la clase)
+model Resource {
+  id        String   @id @default(cuid())
+  nombre    String
+  archivo   String   // URL o path al archivo
+  
+  courseId  String?
+  course    Course?  @relation("CourseResources", fields: [courseId], references: [id], onDelete: Cascade)
+
+  classId   String?
+  class     Class?   @relation("ClassResources", fields: [classId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Modelo de Inscripción (para la relación entre User y Course)
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  fecha_inscripcion DateTime @default(now())
+  completado        Boolean  @default(false)
+
+  @@unique([userId, courseId]) // Un usuario solo puede inscribirse una vez en un curso
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
