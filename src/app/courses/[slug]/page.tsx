@@ -17,8 +17,9 @@ async function getCourse(slug: string) {
   return course;
 }
 
-export default async function CoursePage({ params }: { params: { slug: string } }) {
-  const course = await getCourse(params.slug);
+export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const course = await getCourse(slug);
 
   if (!course) {
     return <div>Curso no encontrado</div>;
