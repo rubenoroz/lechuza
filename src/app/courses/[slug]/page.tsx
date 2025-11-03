@@ -3,12 +3,6 @@ import Image from 'next/image'; // Importar el componente Image
 
 const prisma = new PrismaClient();
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
-}
-
 async function getCourse(slug: string) {
   const course = await prisma.course.findUnique({
     where: { slug },
@@ -23,7 +17,7 @@ async function getCourse(slug: string) {
   return course;
 }
 
-export default async function CoursePage({ params }: PageProps) {
+export default async function CoursePage({ params }: { params: { slug: string } }) {
   const course = await getCourse(params.slug);
 
   if (!course) {
