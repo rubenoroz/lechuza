@@ -1,4 +1,5 @@
 "use client";
+import { PrismaClient, Course } from '@/generated/prisma';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -7,7 +8,11 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import Link from 'next/link';
 import Image from 'next/image'; // Importar el componente Image
 
-const HeroCarousel = ({ courses }) => {
+interface HeroCarouselProps {
+  courses: Course[];
+}
+
+const HeroCarousel = ({ courses }: HeroCarouselProps) => {
   return (
     <Swiper
       modules={[Navigation, Pagination, Autoplay]}
