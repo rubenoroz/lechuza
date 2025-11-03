@@ -39,7 +39,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         </div>
 
         <div className="mt-10">
-          <Image className="w-full h-auto object-contain rounded-lg shadow-lg" src={course.imagen_portada} alt={course.titulo} width={800} height={400} />
+          <Image className="w-full h-auto object-contain rounded-lg shadow-lg" src={course.imagen_portada || '/images/placeholder-course.jpg'} alt={course.titulo} width={800} height={400} />
         </div>
 
         <div className="mt-10 prose prose-lg text-gray-500 mx-auto">
