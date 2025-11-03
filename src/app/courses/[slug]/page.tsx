@@ -1,4 +1,5 @@
 import { PrismaClient } from '@/generated/prisma';
+import Image from 'next/image'; // Importar el componente Image
 
 const prisma = new PrismaClient();
 
@@ -37,7 +38,7 @@ export default async function CoursePage({ params }: { params: { slug: string } 
         </div>
 
         <div className="mt-10">
-          <img className="w-full h-auto object-cover rounded-lg shadow-lg" src={course.imagen_portada || 'https://via.placeholder.com/800x400'} alt={course.titulo} />
+          <Image className="w-full h-auto object-contain rounded-lg shadow-lg" src={course.imagen_portada} alt={course.titulo} width={800} height={400} />
         </div>
 
         <div className="mt-10 prose prose-lg text-gray-500 mx-auto">

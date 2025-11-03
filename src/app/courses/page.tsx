@@ -1,5 +1,6 @@
 import { PrismaClient } from '@/generated/prisma';
 import Link from 'next/link';
+import Image from 'next/image'; // Importar el componente Image
 
 const prisma = new PrismaClient();
 
@@ -30,7 +31,13 @@ export default async function CoursesPage() {
             {courses.map((course) => (
               <div key={course.id} className="flex flex-col rounded-lg shadow-lg overflow-hidden">
                 <div className="flex-shrink-0">
-                  <img className="h-48 w-full object-cover" src={course.imagen_portada || 'https://via.placeholder.com/300'} alt={course.titulo} />
+                  <Image
+                    className="h-64 w-full object-contain"
+                    src={course.imagen_portada}
+                    alt={course.titulo}
+                    width={300} // Ancho de placeholder
+                    height={256} // Altura de placeholder (h-64 = 256px)
+                  />
                 </div>
                 <div className="flex-1 bg-white p-6 flex flex-col justify-between">
                   <div className="flex-1">
@@ -41,15 +48,15 @@ export default async function CoursesPage() {
                       <p className="text-xl font-semibold text-gray-900">{course.titulo}</p>
                       <p className="mt-3 text-base text-gray-500">{course.descripcion_corta}</p>
                     </Link>
+                    <p className="mt-3 text-lg font-bold text-gray-900">${course.precio}</p>
                   </div>
-                  <div className="mt-6 flex items-center">
-                    <div className="flex-shrink-0">
-                      {/* <img className="h-10 w-10 rounded-full" src={course.instructor.foto_perfil} alt={course.instructor.nombre_completo} /> */}
-                    </div>
-                    <div className="ml-3">
-                      {/* <p className="text-sm font-medium text-gray-900">{course.instructor.nombre_completo}</p> */}
-                    </div>
-                  </div>
+                  <div className="mt-6">
+                    <Link
+                      href={`/courses/${course.slug}`}
+                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                    >
+                      Ver curso
+                    </Link>
                 </div>
               </div>
             ))}

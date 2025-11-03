@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -17,6 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Lechuza - Tu plataforma de aprendizaje",
   description: "Cursos en línea para todas las edades y niveles.",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({
