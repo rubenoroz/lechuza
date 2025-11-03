@@ -57,6 +57,7 @@ export default async function CoursesPage() {
                     >
                       Ver curso
                     </Link>
+                  </div>
                 </div>
               </div>
             ))}
