@@ -20,8 +20,8 @@ export default async function CoursesPage() {
     <div className="bg-white">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
-          <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Catálogo</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase font-inter">Catálogo</h2>
+          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl font-playfair-display">
             Todos nuestros cursos
           </p>
         </div>
@@ -41,19 +41,19 @@ export default async function CoursesPage() {
                 </div>
                 <div className="flex-1 bg-white p-6 flex flex-col justify-between">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-blue-600">
+                    <p className="text-sm font-medium text-blue-600 font-inter">
                       {course.modalidad}
                     </p>
                     <Link href={`/courses/${course.slug}`} className="block mt-2">
-                      <p className="text-xl font-semibold text-gray-900">{course.titulo}</p>
-                      <p className="mt-3 text-base text-gray-500">{course.descripcion_corta}</p>
+                      <p className="text-xl font-semibold text-gray-900 font-playfair-display">{course.titulo}</p>
+                      <p className="mt-3 text-base text-gray-500 font-inter">{course.descripcion_corta}</p>
                     </Link>
-                    <p className="mt-3 text-lg font-bold text-gray-900">${course.precio}</p>
+                    <p className="mt-3 text-lg font-bold text-gray-900 font-inter">${course.precio}</p>
                   </div>
                   <div className="mt-6">
                     <Link
                       href={`/courses/${course.slug}`}
-                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 font-inter"
                     >
                       Ver curso
                     </Link>
