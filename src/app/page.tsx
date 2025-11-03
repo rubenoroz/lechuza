@@ -38,7 +38,7 @@ export default async function Home() {
                   <div className="flex-shrink-0">
                     <Image
                       className="h-64 w-full object-contain"
-                      src={course.imagen_portada}
+                      src={course.imagen_portada || '/images/placeholder-course.jpg'}
                       alt={course.titulo}
                       width={300} // Ancho de placeholder
                       height={256} // Altura de placeholder (h-64 = 256px)
