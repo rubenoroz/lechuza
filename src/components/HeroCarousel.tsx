@@ -29,7 +29,7 @@ const HeroCarousel = ({ courses }: HeroCarouselProps) => {
             <div className="absolute inset-0">
               <Image
                 className="w-full h-[600px] object-cover"
-                src={course.imagen_portada}
+                src={course.imagen_portada || '/images/placeholder-course.jpg'}
                 alt={course.titulo}
                 width={1200} // Ancho de placeholder
                 height={600} // Altura de placeholder
