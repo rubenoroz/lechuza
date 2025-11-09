@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
 // PUT - Aprobar o Rechazar una solicitud de inscripción
 export async function PUT(
-  request: Request,
-  context: { params: { requestId: string } }
+  request: NextRequest,
+  { params }: { params: { requestId: string } }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -15,7 +15,7 @@ export async function PUT(
   }
 
   try {
-    const { requestId } = context.params;
+    const { requestId } = params;
     const body = await request.json();
     const { status } = body; // 'APPROVED' or 'REJECTED'
 
