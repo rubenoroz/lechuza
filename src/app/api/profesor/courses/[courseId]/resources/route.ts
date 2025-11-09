@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,8 +14,7 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const resolvedParams = await params;
-    const { courseId } = resolvedParams;
+    const { courseId } = await params;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
@@ -45,7 +44,7 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -60,8 +59,7 @@ export async function POST(
       return new NextResponse('Name, type, and either URL or filePath are required', { status: 400 });
     }
 
-    const resolvedParams = await params;
-    const { courseId } = resolvedParams;
+    const { courseId } = await params;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
