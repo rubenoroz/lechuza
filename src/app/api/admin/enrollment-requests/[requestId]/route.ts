@@ -6,10 +6,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // PUT - Aprobar o Rechazar una solicitud de inscripción
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { requestId: string } }
+  context: { params: { requestId: string } }
 ) {
-  // Cuerpo de la función comentado para depuración
-  return NextResponse.json({ message: `Debug response for request ID: ${params.requestId}` });
+  const { requestId } = context.params; // Destructure inside the function
+  return NextResponse.json({ message: `Debug response for request ID: ${requestId}` });
 
   /*
   const session = await getServerSession(authOptions);
