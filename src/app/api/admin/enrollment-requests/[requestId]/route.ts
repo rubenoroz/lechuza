@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import prisma from '@/lib/prisma';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+// import prisma from '@/lib/prisma';
 
 // PUT - Aprobar o Rechazar una solicitud de inscripción
 export async function PUT(
   request: NextRequest,
   { params }: { params: { requestId: string } }
 ) {
+  // Cuerpo de la función comentado para depuración
+  return NextResponse.json({ message: `Debug response for request ID: ${params.requestId}` });
+
+  /*
   const session = await getServerSession(authOptions);
 
   if (!session || (!session.user.isEnrollmentAdmin && !session.user.isSuperAdmin)) {
@@ -69,4 +73,5 @@ export async function PUT(
     }
     return new NextResponse('Internal Server Error', { status: 500 });
   }
+  */
 }
