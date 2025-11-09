@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // GET - Obtener un ejercicio específico por ID
 export async function GET(
   request: Request,
-  { params }: { params: { exerciseId: string } }
+  { params }: { params: Promise<{ exerciseId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -15,8 +15,7 @@ export async function GET(
   }
 
   try {
-    const resolvedParams = await params;
-    const { exerciseId } = resolvedParams;
+    const { exerciseId } = await params;
 
     const exercise = await prisma.exercise.findUnique({
       where: {
@@ -39,7 +38,7 @@ export async function GET(
 // PUT - Actualizar un ejercicio
 export async function PUT(
   request: Request,
-  { params }: { params: { exerciseId: string } }
+  { params }: { params: Promise<{ exerciseId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -50,8 +49,7 @@ export async function PUT(
   try {
     const body = await request.json();
     const { instrucciones } = body;
-    const resolvedParams = await params;
-    const { exerciseId } = resolvedParams;
+    const { exerciseId } = await params;
 
     if (!instrucciones) {
       return new NextResponse('Instructions are required', { status: 400 });
@@ -76,7 +74,7 @@ export async function PUT(
 // DELETE - Eliminar un ejercicio
 export async function DELETE(
   request: Request,
-  { params }: { params: { exerciseId: string } }
+  { params }: { params: Promise<{ exerciseId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -85,8 +83,7 @@ export async function DELETE(
   }
 
   try {
-    const resolvedParams = await params;
-    const { exerciseId } = resolvedParams;
+    const { exerciseId } = await params;
 
     const classUsingExercise = await prisma.class.findFirst({
         where: { exerciseId: exerciseId }
