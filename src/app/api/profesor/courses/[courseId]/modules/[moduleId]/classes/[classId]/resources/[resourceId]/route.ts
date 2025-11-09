@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { courseId: string, classId: string, resourceId: string } }
+  { params }: { params: { courseId: string, moduleId: string, classId: string, resourceId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,6 +14,10 @@ export async function PUT(
 
     if (!session || !session.user) {
       return new NextResponse('Unauthorized', { status: 401 });
+    }
+
+    if (!nombre || !tipo || (!url && !filePath)) {
+      return new NextResponse('Name, type, and either URL or filePath are required', { status: 400 });
     }
 
     const { courseId, classId, resourceId } = params;
@@ -51,7 +55,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { courseId: string, classId: string, resourceId: string } }
+  { params }: { params: { courseId: string, moduleId: string, classId: string, resourceId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
