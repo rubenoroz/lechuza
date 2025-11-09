@@ -43,8 +43,8 @@ export async function GET(request: Request) {
     const id = getIdFromUrl(request.url);
 
     // If user is an instructor but not a super admin, check ownership
-    if (session.user?.isProfesor && !session.user?.isSuperAdmin) {
-      const isOwner = await checkCourseOwnership(id, session.user.id);
+    if (user?.isProfesor && !user?.isSuperAdmin) {
+      const isOwner = await checkCourseOwnership(id, user.id);
       if (!isOwner) {
         return NextResponse.json({ message: 'Unauthorized: You do not own this course.' }, { status: 403 });
       }
@@ -68,7 +68,10 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session || (!session.user?.isSuperAdmin && !session.user?.isProfesor)) {
+  // Forzar el tipo de session.user a ExtendedUser
+  const user = session?.user as ExtendedUser;
+
+  if (!session || (!user?.isSuperAdmin && !user?.isProfesor)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -86,8 +89,8 @@ export async function PUT(request: Request) {
     }
 
     // Check ownership for instructors
-    if (session.user?.isProfesor && !session.user?.isSuperAdmin) {
-      if (currentCourse.profesorId !== session.user.id) {
+    if (user?.isProfesor && !user?.isSuperAdmin) {
+      if (currentCourse.profesorId !== user.id) {
         return NextResponse.json({ message: 'Unauthorized: You do not own this course.' }, { status: 403 });
       }
       // Profesores no pueden cambiar el estado 'activo' directamente
@@ -100,7 +103,7 @@ export async function PUT(request: Request) {
         // Prepare data for CourseDraft, excluding fields not in CourseDraft or handled differently
         const draftData = {
           courseId: id,
-          profesorId: session.user.id,
+          profesorId: user.id,
           titulo: body.titulo || currentCourse.titulo, // Use body value or current if not provided
           slug: body.slug,
           descripcion_corta: body.descripcion_corta,
@@ -163,8 +166,11 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   const session = await getServerSession(authOptions);
 
+  // Forzar el tipo de session.user a ExtendedUser
+  const user = session?.user as ExtendedUser;
+
   // Only Super Admins can delete courses
-  if (!session || !session.user?.isSuperAdmin) {
+  if (!session || !user?.isSuperAdmin) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
