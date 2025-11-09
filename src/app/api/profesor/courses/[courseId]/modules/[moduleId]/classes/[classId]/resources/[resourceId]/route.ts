@@ -16,15 +16,9 @@ export async function PUT(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    if (!nombre || !tipo || (!url && !filePath)) {
-      return new NextResponse('Name, type, and either URL or filePath are required', { status: 400 });
-    }
-
-    const { courseId, classId, resourceId } = await params;
-
     const course = await prisma.course.findUnique({
       where: { id: courseId },
-      select: { instructorId: true, activo: true }
+      select: { profesorId: true, activo: true }
     });
 
     if (!course) {
@@ -68,7 +62,7 @@ export async function DELETE(
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
-      select: { instructorId: true, activo: true }
+      select: { profesorId: true, activo: true }
     });
 
     if (!course) {
