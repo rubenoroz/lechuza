@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 const MainMenu = () => {
   return (
-    <nav className="hidden md:flex space-x-4 mt-[-10px]">
+    <nav className="hidden md:flex space-x-4">
       <Link href="/" className="text-gray-600 hover:text-gray-800">Inicio</Link>
       <Link href="/courses" className="text-gray-600 hover:text-gray-800">Cursos</Link>
       <Link href="/about" className="text-gray-600 hover:text-gray-800">Nosotros</Link>

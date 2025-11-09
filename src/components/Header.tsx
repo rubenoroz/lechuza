@@ -4,11 +4,16 @@ import MainMenu from './MainMenu';
 
 const Header = () => {
   return (
-    <header className="bg-white shadow-md relative z-20 h-24 overflow-visible">
-      <TopBar />
-      <div className="container mx-auto px-4 py-0 flex justify-between items-center">
+    <header className="bg-white shadow-md relative z-20 h-24">
+      {/* TopBar se posiciona de forma absoluta para no afectar al flujo del menú principal */}
+      <div className="absolute top-0 left-0 right-0 z-30">
+        <TopBar />
+      </div>
+      
+      {/* Contenedor principal con padding superior para dejar espacio a la TopBar */}
+      <div className="container mx-auto px-4 h-full flex justify-between items-center pt-10">
         <Logo />
-        <div className="flex items-center justify-end">
+        <div className="flex items-center">
           <MainMenu />
         </div>
         <div className="md:hidden ml-4">

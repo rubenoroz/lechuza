@@ -1,126 +1,101 @@
-// prisma/seed.js
 const { PrismaClient } = require('../src/generated/prisma');
+const bcrypt = require('bcrypt');
+const { cursos } = require('../data/cursos.js');
+
 const prisma = new PrismaClient();
 
 async function main() {
-  // Crear usuarios de ejemplo (instructores y estudiantes)
-  const instructor1 = await prisma.user.upsert({
-    where: { email: 'instructor1@lechuza.com' },
-    update: {},
-    create: {
-      email: 'instructor1@lechuza.com',
-      name: 'Profesor Juan Pérez',
-      nombre_completo: 'Juan Pérez García',
-      foto_perfil: 'https://randomuser.me/api/portraits/men/1.jpg',
-      biografia: 'Experto en producción audiovisual con más de 10 años de experiencia.',
-      role: 'INSTRUCTOR',
-      password: 'password123', // En un entorno real, esto debería ser hasheado
+  console.log('Limpiando la base de datos...');
+  // Eliminar en orden inverso para evitar problemas de constraint
+  await prisma.enrollment.deleteMany({});
+  await prisma.resource.deleteMany({});
+  await prisma.option.deleteMany({});
+  await prisma.question.deleteMany({});
+  await prisma.quiz.deleteMany({});
+  await prisma.exercise.deleteMany({});
+  await prisma.class.deleteMany({});
+  await prisma.module.deleteMany({});
+  await prisma.course.deleteMany({});
+  await prisma.user.deleteMany({});
+  
+  console.log('Base de datos limpiada.');
+
+  console.log('Creando usuarios base...');
+  const hashedPassword = await bcrypt.hash('password123', 10);
+
+  const adminUser = await prisma.user.create({
+    data: {
+      email: 'admin@lechuza.com',
+      password: hashedPassword,
+      nombres: 'Admin',
+      apellido_paterno: 'Principal',
+      apellido_materno: 'Web',
+      telefono: '1234567890',
+      isSuperAdmin: true,
+      isEnrollmentAdmin: true,
+      isProfesor: true,
+      isStudent: true,
     },
   });
 
-  const instructor2 = await prisma.user.upsert({
-    where: { email: 'instructor2@lechuza.com' },
-    update: {},
-    create: {
-      email: 'instructor2@lechuza.com',
-      name: 'Profesora Ana Gómez',
-      nombre_completo: 'Ana Gómez Ruiz',
-      foto_perfil: 'https://randomuser.me/api/portraits/women/2.jpg',
-      biografia: 'Especialista en diseño gráfico y herramientas digitales para niños.',
-      role: 'INSTRUCTOR',
-      password: 'password123',
+  const profesorUser = await prisma.user.create({
+    data: {
+      email: 'profesor@lechuza.com',
+      password: hashedPassword,
+      nombres: 'Profesor',
+      apellido_paterno: 'Lechuza',
+      apellido_materno: 'Cursos',
+      telefono: '0987654321',
+      isProfesor: true,
+      isEnrollmentAdmin: false,
+      isStudent: false, // Un profesor no es estudiante por defecto
+      biografia: 'Un apasionado profesor con más de 10 años de experiencia en desarrollo web y tecnologías modernas.'
     },
   });
 
-  // Crear cursos de ejemplo
-  const course1 = await prisma.course.upsert({
-    where: { slug: 'produccion-audiovisual-basica' },
-    update: {},
-    create: {
-      titulo: 'Producción Audiovisual Básica',
-      slug: 'produccion-audiovisual-basica',
-      descripcion_corta: 'Aprende los fundamentos de la producción de video y audio.',
-      descripcion_larga: 'Este curso te introducirá en el emocionante mundo de la producción audiovisual, cubriendo desde la pre-producción hasta la post-producción.',
-      imagen_portada: '/images/course_image_1.jpg',
-      modalidad: 'OnlineGrabado',
-      nivel: 'Basico',
-      publico_objetivo: 'Profesionales',
-      precio: 99.99,
-      instructorId: instructor1.id,
-      modulos: {
-        create: [
-          {
-            titulo: 'Introducción a la Producción',
-            order: 0,
+  console.log(`Usuarios creados: ${adminUser.nombres}, ${profesorUser.nombres}`);
+
+  console.log('Creando cursos desde data/cursos.js...');
+  for (const curso of cursos) {
+    const { modulos, ...cursoData } = curso;
+
+    const nuevoCurso = await prisma.course.create({
+      data: {
+        ...cursoData,
+        profesorId: profesorUser.id,
+        modulos: {
+          create: modulos.map(modulo => ({
+            titulo: modulo.titulo,
+            order: modulo.order,
             clases: {
-              create: [
-                { titulo: '¿Qué es la Producción Audiovisual?', tipo_contenido: 'Video', order: 0, contenido_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-                { titulo: 'Equipo Básico', tipo_contenido: 'Texto', order: 1, contenido_texto: 'Contenido sobre cámaras, micrófonos, etc.' },
-              ],
+              create: modulo.clases.map(clase => ({
+                titulo: clase.titulo,
+                tipo_contenido: clase.tipo_contenido,
+                contenido_video: clase.contenido_video,
+                contenido_texto: clase.contenido_texto,
+                order: clase.order,
+              })),
             },
-          },
-          {
-            titulo: 'Edición y Post-producción',
-            order: 1,
-            clases: {
-              create: [
-                { titulo: 'Principios de Edición', tipo_contenido: 'Video', order: 0, contenido_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-                { titulo: 'Color Grading', tipo_contenido: 'Texto', order: 1, contenido_texto: 'Contenido sobre corrección de color.' },
-              ],
-            },
-          },
-        ],
+          })),
+        },
       },
-    },
-  });
-
-  const course2 = await prisma.course.upsert({
-    where: { slug: 'creacion-contenido-youtuber-ninos' },
-    update: {},
-    create: {
-      titulo: 'Crea tu Canal de YouTube (para niños)',
-      slug: 'creacion-contenido-youtuber-ninos',
-      descripcion_corta: 'Aprende a crear videos divertidos y seguros para YouTube.',
-      descripcion_larga: 'Un curso diseñado para que los niños exploren su creatividad y aprendan a producir contenido de video de forma segura y divertida.',
-      imagen_portada: '/images/course_image_2.jpg',
-      modalidad: 'OnlineEnVivo',
-      nivel: 'Basico',
-      publico_objetivo: 'Ninos',
-      precio: 49.99,
-      instructorId: instructor2.id,
-      modulos: {
-        create: [
-          {
-            titulo: 'Ideas y Guiones',
-            order: 0,
-            clases: {
-              create: [
-                { titulo: 'Brainstorming de Ideas', tipo_contenido: 'Texto', order: 0, contenido_texto: 'Cómo encontrar ideas geniales.' },
-                { titulo: 'Escribiendo tu Primer Guion', tipo_contenido: 'Video', order: 1, contenido_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-              ],
-            },
+      include: {
+        modulos: {
+          include: {
+            clases: true,
           },
-          {
-            titulo: 'Grabación y Edición Simple',
-            order: 1,
-            clases: {
-              create: [
-                { titulo: 'Consejos para Grabar', tipo_contenido: 'Video', order: 0, contenido_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-                { titulo: 'Edición con CapCut', tipo_contenido: 'Texto', order: 1, contenido_texto: 'Tutorial básico de edición.' },
-              ],
-            },
-          },
-        ],
+        },
       },
-    },
-  });
+    });
+    console.log(`- Curso creado: "${nuevoCurso.titulo}" con ${nuevoCurso.modulos.length} módulos.`);
+  }
 
-  console.log({ course1, course2 });
+  console.log('¡Seeding completado exitosamente!');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Error durante el seeding:', e);
     process.exit(1);
   })
   .finally(async () => {

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@/generated/prisma';
 import Image from 'next/image'; // Importar el componente Image
+import EnrollmentButton from '@/components/student/EnrollmentButton';
 
 const prisma = new PrismaClient();
 
@@ -38,6 +39,12 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
           </p>
         </div>
 
+        {/* Price and Enrollment Button */}
+        <div className="mt-8 max-w-md mx-auto text-center">
+          <p className="text-4xl font-bold text-gray-900">${course.precio.toLocaleString('es-MX')}</p>
+          <EnrollmentButton courseId={course.id} />
+        </div>
+
         <div className="mt-10">
           <Image className="w-full h-auto object-contain rounded-lg shadow-lg" src={course.imagen_portada || '/images/placeholder-course.jpg'} alt={course.titulo} width={800} height={400} />
         </div>
@@ -58,7 +65,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                       <svg className="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span>{clase.titulo}</span>
+                      <span className="text-gray-700">{clase.titulo}</span>
                     </li>
                   ))}
                 </ul>

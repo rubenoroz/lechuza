@@ -13,35 +13,41 @@ datasource db {
 
 // Modelo de Usuario (extendido del base de NextAuth.js o similar)
 model User {
-  id              String    @id @default(cuid())
-  email           String    @unique
-  password        String?   // Para autenticación con credenciales
-  name            String?
-  image           String?
-  role            Role      @default(STUDENT) // Administrador, Instructor, Alumno
+  id               String    @id @default(cuid())
+  email            String    @unique
+  password         String?   // Para autenticación con credenciales
+  image            String?
+  
+  // Sistema de roles basado en capacidades
+  isSuperAdmin     Boolean   @default(false)
+  isEnrollmentAdmin Boolean   @default(false)
+  isProfesor     Boolean   @default(false)
+  isStudent        Boolean   @default(true)
 
   // Campos adicionales del modelo de Usuario
-  nombre_completo String?
-  foto_perfil     String?
-  biografia       String?
+  nombres          String
+  apellido_paterno String
+  apellido_materno String?
+  telefono         String?
+  
+  foto_perfil      String?
+  biografia        String?
   numero_matricula String?   @unique
 
   // Relaciones
   coursesEnrolled Enrollment[] // Cursos a los que el alumno está inscrito
-  coursesCreated  Course[]     @relation("InstructorCourses") // Cursos creados por este instructor
+  coursesCreated  Course[]     @relation("ProfesorCourses") // Cursos creados por este profesor
+  courseDrafts    CourseDraft[] @relation("DraftProfesor") // Borradores de cursos creados por este profesor
+  enrollmentRequests EnrollmentRequest[]
 
   // Para el progreso del curso (JSON)
   progreso_cursos Json? // { "curso_slug": { "modulo_1": ["clase_1_1"], ... } }
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
-enum Role {
-  ADMIN
-  INSTRUCTOR
-  STUDENT
-}
+
 
 // Modelo de Curso
 model Course {
@@ -59,12 +65,14 @@ model Course {
   activo             Boolean    @default(true)
 
   // Relaciones
-  instructorId       String
-  instructor         User       @relation("InstructorCourses", fields: [instructorId], references: [id])
+  profesorId         String?
+  profesor           User?      @relation("ProfesorCourses", fields: [profesorId], references: [id])
   enrollments        Enrollment[] // Alumnos inscritos en este curso
+  enrollmentRequests EnrollmentRequest[]
 
   modulos            Module[]
   recursos_generales Resource[] @relation("CourseResources")
+  draft              CourseDraft? // Borrador de cambios para este curso
 
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
@@ -75,6 +83,7 @@ enum Modalidad {
   OnlineEnVivo
   Presencial
   Hibrido
+  CapacitacionEmpresas
 }
 
 enum Nivel {
@@ -109,7 +118,10 @@ model Class {
   id               String         @id @default(cuid())
   titulo           String
   tipo_contenido   TipoContenido
-  contenido_video  String?
+  contenido_video   String? // URL del video (ej. YouTube, Vimeo)
+  videoFilePath     String? // Ruta al archivo de video subido localmente
+  videoMimeType     String? // Tipo MIME del archivo de video
+  videoFileSize     Int?    // Tamaño del archivo de video en bytes
   contenido_texto  String?
   order            Int            @default(0)
 
@@ -188,16 +200,21 @@ model Option {
 model Resource {
   id        String   @id @default(cuid())
   nombre    String
-  archivo   String   // URL o path al archivo
-  
-  courseId  String?
-  course    Course?  @relation("CourseResources", fields: [courseId], references: [id], onDelete: Cascade)
-
-  classId   String?
-  class     Class?   @relation("ClassResources", fields: [classId], references: [id], onDelete: Cascade)
-
+  url       String?
+  filePath  String?
+  mimeType  String?
+  fileSize  Int?
+  tipo      String   @default("Enlace") // Puede ser "Enlace", "PDF", "Video", etc.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relación con Class
+  classId String?
+  class   Class?   @relation("ClassResources", fields: [classId], references: [id], onDelete: Cascade)
+
+  // Relación con Course (para recursos generales del curso)
+  courseId String?
+  course   Course? @relation("CourseResources", fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 // Modelo de Inscripción (para la relación entre User y Course)
@@ -214,4 +231,50 @@ model Enrollment {
   @@unique([userId, courseId]) // Un usuario solo puede inscribirse una vez en un curso
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum EnrollmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model EnrollmentRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status    EnrollmentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId])
+}
+
+// Modelo de Borrador de Curso (para cambios pendientes de revisión)
+model CourseDraft {
+  id                 String     @id @default(cuid())
+  courseId           String     @unique // Enlace al curso original
+  course             Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  profesorId       String?     // Quién creó el borrador
+  profesor         User?      @relation("DraftProfesor", fields: [profesorId], references: [id])
+
+  titulo             String
+  slug               String
+  descripcion_corta  String
+  descripcion_larga  String
+  imagen_portada     String?
+  video_presentacion String?
+  modalidad          Modalidad
+  nivel              Nivel
+  publico_objetivo   PublicoObjetivo
+  precio             Float
+  
+  isPendingReview    Boolean    @default(true) // Indica si el borrador está pendiente de revisión
+
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 }
