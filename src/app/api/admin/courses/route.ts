@@ -2,11 +2,24 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { User as NextAuthUser } from 'next-auth'; // Importar el tipo User de next-auth
+
+// Extender el tipo User para usarlo localmente
+interface ExtendedUser extends NextAuthUser {
+  id: string;
+  isSuperAdmin?: boolean;
+  isEnrollmentAdmin?: boolean;
+  isProfesor?: boolean;
+  isStudent?: boolean;
+}
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session || (!session.user?.isSuperAdmin && !session.user?.isProfesor)) {
+  // Forzar el tipo de session.user a ExtendedUser
+  const user = session?.user as ExtendedUser;
+
+  if (!session || (!user?.isSuperAdmin && !user?.isProfesor)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -68,7 +81,10 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session || (!session.user?.isSuperAdmin && !session.user?.isProfesor)) {
+  // Forzar el tipo de session.user a ExtendedUser
+  const user = session?.user as ExtendedUser;
+
+  if (!session || (!user?.isSuperAdmin && !user?.isProfesor)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -82,8 +98,8 @@ export async function GET(request: Request) {
     let whereClause: any = {};
 
     // If user is an instructor but not a super admin, filter by their own courses
-    if (session.user?.isProfesor && !session.user?.isSuperAdmin) {
-      whereClause.profesorId = session.user.id;
+    if (user?.isProfesor && !user?.isSuperAdmin) {
+      whereClause.profesorId = user.id;
     }
 
     const [courses, totalCourses] = await prisma.$transaction([
