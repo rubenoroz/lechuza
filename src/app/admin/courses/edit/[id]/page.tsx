@@ -1,15 +1,12 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { Session } from 'next-auth'; // Importar Session
 import Link from 'next/link';
+import { useCustomSession } from '@/hooks/useCustomSession'; // Importar el custom hook
 
 export default function EditCoursePage() {
   const params = useParams();
   const id = params.id as string;
-  const { data: session } = useSession();
+  const { data: session } = useCustomSession(); // Usar el custom hook
   const router = useRouter();
 
   const [titulo, setTitulo] = useState('');
@@ -28,11 +25,8 @@ export default function EditCoursePage() {
   const [profesores, setProfesores] = useState([]);
   const [error, setError] = useState('');
 
-  // Usar type assertion para asegurar que session.user tiene los tipos extendidos
-  const typedSession = session as Session;
-
-  const isProfesorUser = typedSession?.user?.isProfesor && !typedSession?.user?.isSuperAdmin;
-  const canEditActivo = typedSession?.user?.isSuperAdmin; // Only Super Admins can edit activo
+  const isProfesorUser = session?.user?.isProfesor && !session?.user?.isSuperAdmin;
+  const canEditActivo = session?.user?.isSuperAdmin; // Only Super Admins can edit activo
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,8 +48,8 @@ export default function EditCoursePage() {
         setActivo(courseData.activo); // Populate activo state
         
         // If logged-in user is an instructor, set their ID as the instructorId
-        if (isProfesorUser && typedSession?.user?.id) {
-          setProfesorId(typedSession.user.id);
+        if (isProfesorUser && session?.user?.id) {
+          setProfesorId(session.user.id);
         } else {
           setProfesorId(courseData.instructorId || '');
         }
@@ -64,7 +58,7 @@ export default function EditCoursePage() {
       }
 
       // Solo obtener profesores si el usuario es un Super Admin
-      if (typedSession?.user?.isSuperAdmin) {
+      if (session?.user?.isSuperAdmin) {
         const profesoresRes = await fetch('/api/admin/profesores');
         if (profesoresRes.ok) {
           const data = await profesoresRes.json();
