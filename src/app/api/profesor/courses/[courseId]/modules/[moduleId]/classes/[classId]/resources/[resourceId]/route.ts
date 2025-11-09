@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ courseId: string, classId: string, resourceId: string }> }
+  { params }: { params: { courseId: string, classId: string, resourceId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,8 +16,10 @@ export async function PUT(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
+    const { courseId, classId, resourceId } = params;
+
     const course = await prisma.course.findUnique({
-      where: { id: resolvedParams.courseId },
+      where: { id: courseId },
       select: { profesorId: true, activo: true }
     });
 
@@ -49,7 +51,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ courseId: string, classId: string, resourceId: string }> }
+  { params }: { params: { courseId: string, classId: string, resourceId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -58,11 +60,10 @@ export async function DELETE(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const resolvedParams = await params;
-    const { courseId, classId, resourceId } = resolvedParams;
+    const { courseId, classId, resourceId } = params;
 
     const course = await prisma.course.findUnique({
-      where: { id: resolvedParams.courseId },
+      where: { id: courseId },
       select: { profesorId: true, activo: true }
     });
 
