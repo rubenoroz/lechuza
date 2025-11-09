@@ -19,6 +19,7 @@ export async function GET(request: Request) {
             nombres: true,
             apellido_paterno: true,
             apellido_materno: true,
+            email: true, // Add email to the selection
           },
         },
       },
