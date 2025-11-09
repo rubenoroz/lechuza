@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { User as NextAuthUser } from 'next-auth'; // Importar el tipo User de next-auth
+
+// Extender el tipo User para usarlo localmente
+interface ExtendedUser extends NextAuthUser {
+  id: string;
+  isSuperAdmin?: boolean;
+  isEnrollmentAdmin?: boolean;
+  isProfesor?: boolean;
+  isStudent?: boolean;
+}
 
 // Helper to get ID from URL
 const getIdFromUrl = (url: string) => {
@@ -22,7 +32,10 @@ async function checkCourseOwnership(courseId: string, userId: string): Promise<b
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session || (!session.user?.isSuperAdmin && !session.user?.isProfesor)) {
+  // Forzar el tipo de session.user a ExtendedUser
+  const user = session?.user as ExtendedUser;
+
+  if (!session || (!user?.isSuperAdmin && !user?.isProfesor)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
