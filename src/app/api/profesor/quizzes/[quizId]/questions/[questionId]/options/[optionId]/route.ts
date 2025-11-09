@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // PUT - Actualizar una opción
 export async function PUT(
   request: Request,
-  { params }: { params: { optionId: string } }
+  { params }: { params: Promise<{ optionId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -17,8 +17,7 @@ export async function PUT(
   try {
     const body = await request.json();
     const { texto, es_correcta } = body;
-    const resolvedParams = await params;
-    const { optionId } = resolvedParams;
+    const { optionId } = await params;
 
     if (texto === undefined && es_correcta === undefined) {
       return new NextResponse('Either text or correctness status is required for update', { status: 400 });
@@ -44,7 +43,7 @@ export async function PUT(
 // DELETE - Eliminar una opción
 export async function DELETE(
   request: Request,
-  { params }: { params: { optionId: string } }
+  { params }: { params: Promise<{ optionId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -53,8 +52,7 @@ export async function DELETE(
   }
 
   try {
-    const resolvedParams = await params;
-    const { optionId } = resolvedParams;
+    const { optionId } = await params;
 
     await prisma.option.delete({
       where: {
