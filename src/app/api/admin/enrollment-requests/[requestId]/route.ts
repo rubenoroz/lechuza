@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // PUT - Aprobar o Rechazar una solicitud de inscripción
 export async function PUT(
   request: Request,
-  { params }: { params: { requestId: string } }
+  context: { params: { requestId: string } }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -15,8 +15,7 @@ export async function PUT(
   }
 
   try {
-    const resolvedParams = await params;
-    const { requestId } = resolvedParams;
+    const { requestId } = context.params;
     const body = await request.json();
     const { status } = body; // 'APPROVED' or 'REJECTED'
 
