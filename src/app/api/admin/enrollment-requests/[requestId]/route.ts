@@ -15,8 +15,7 @@ export async function PUT(
   }
 
   try {
-    const resolvedParams = await params;
-    const { requestId } = resolvedParams;
+    const { requestId } = params;
     const body = await request.json();
     const { status } = body; // 'APPROVED' or 'REJECTED'
 
