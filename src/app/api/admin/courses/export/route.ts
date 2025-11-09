@@ -67,7 +67,7 @@ export async function GET(request: Request) {
         course.publico_objetivo,
         course.precio,
         course.activo ? 'Sí' : 'No',
-        course.instructorId,
+        course.profesorId,
         profesorName,
         profesorEmail,
         course.createdAt.toISOString(),
