@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // PUT - Actualizar una pregunta
 export async function PUT(
   request: Request,
-  { params }: { params: { quizId: string; questionId: string } }
+  { params }: { params: Promise<{ quizId: string; questionId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -17,8 +17,7 @@ export async function PUT(
   try {
     const body = await request.json();
     const { texto } = body;
-    const resolvedParams = await params;
-    const { questionId } = resolvedParams;
+    const { questionId } = await params;
 
     if (!texto) {
       return new NextResponse('Question text is required', { status: 400 });
@@ -43,7 +42,7 @@ export async function PUT(
 // DELETE - Eliminar una pregunta
 export async function DELETE(
   request: Request,
-  { params }: { params: { quizId: string; questionId: string } }
+  { params }: { params: Promise<{ quizId: string; questionId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -52,8 +51,7 @@ export async function DELETE(
   }
 
   try {
-    const resolvedParams = await params;
-    const { questionId } = resolvedParams;
+    const { questionId } = await params;
 
     await prisma.question.delete({
       where: {

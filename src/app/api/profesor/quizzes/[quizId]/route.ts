@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // GET - Obtener un quiz específico por ID
 export async function GET(
   request: Request,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -15,8 +15,7 @@ export async function GET(
   }
 
   try {
-    const resolvedParams = await params;
-    const { quizId } = resolvedParams;
+    const { quizId } = await params;
 
     const quiz = await prisma.quiz.findUnique({
       where: {
@@ -49,7 +48,7 @@ export async function GET(
 // PUT - Actualizar un quiz
 export async function PUT(
   request: Request,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -60,8 +59,7 @@ export async function PUT(
   try {
     const body = await request.json();
     const { titulo } = body;
-    const resolvedParams = await params;
-    const { quizId } = resolvedParams;
+    const { quizId } = await params;
 
     if (!titulo) {
       return new NextResponse('Title is required', { status: 400 });
@@ -86,7 +84,7 @@ export async function PUT(
 // DELETE - Eliminar un quiz
 export async function DELETE(
   request: Request,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -95,8 +93,7 @@ export async function DELETE(
   }
 
   try {
-    const resolvedParams = await params;
-    const { quizId } = resolvedParams;
+    const { quizId } = await params;
 
     // Opcional: verificar si el quiz está siendo usado en alguna clase
     const classUsingQuiz = await prisma.class.findFirst({

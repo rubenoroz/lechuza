@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // GET - Obtener el contenido de un quiz para un estudiante
 export async function GET(
   request: Request,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -15,8 +15,7 @@ export async function GET(
   }
 
   try {
-    const resolvedParams = await params;
-    const { quizId } = resolvedParams;
+    const { quizId } = await params;
     const userId = session.user.id;
 
     // 1. Verificar que el quiz existe y está asociado a una clase

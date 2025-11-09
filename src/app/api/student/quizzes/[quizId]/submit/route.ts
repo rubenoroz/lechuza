@@ -10,7 +10,7 @@ interface Answers {
 // POST - Enviar las respuestas de un quiz y obtener el resultado
 export async function POST(
   request: Request,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -19,8 +19,7 @@ export async function POST(
   }
 
   try {
-    const resolvedParams = await params;
-    const { quizId } = resolvedParams;
+    const { quizId } = await params;
     const userId = session.user.id;
     const body = await request.json();
     const studentAnswers: Answers = body.answers;

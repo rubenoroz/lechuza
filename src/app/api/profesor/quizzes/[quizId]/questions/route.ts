@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // POST - Crear una nueva pregunta para un quiz
 export async function POST(
   request: Request,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -17,8 +17,7 @@ export async function POST(
   try {
     const body = await request.json();
     const { texto } = body;
-    const resolvedParams = await params;
-    const { quizId } = resolvedParams;
+    const { quizId } = await params;
 
     if (!texto) {
       return new NextResponse('Question text is required', { status: 400 });
