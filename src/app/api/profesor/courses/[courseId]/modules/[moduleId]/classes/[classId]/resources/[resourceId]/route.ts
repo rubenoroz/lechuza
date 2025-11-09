@@ -17,7 +17,7 @@ export async function PUT(
     }
 
     const course = await prisma.course.findUnique({
-      where: { id: courseId },
+      where: { id: resolvedParams.courseId },
       select: { profesorId: true, activo: true }
     });
 
@@ -26,7 +26,7 @@ export async function PUT(
     }
 
     // Solo el profesor del curso o un Super Admin puede actualizar recursos de clase
-    if (course.instructorId !== session.user.id && !session.user.isSuperAdmin) {
+    if (course.profesorId !== session.user.id && !session.user.isSuperAdmin) {
       return new NextResponse('Forbidden', { status: 403 });
     }
 
@@ -58,10 +58,11 @@ export async function DELETE(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { courseId, classId, resourceId } = await params;
+    const resolvedParams = await params;
+    const { courseId, classId, resourceId } = resolvedParams;
 
     const course = await prisma.course.findUnique({
-      where: { id: courseId },
+      where: { id: resolvedParams.courseId },
       select: { profesorId: true, activo: true }
     });
 
@@ -70,7 +71,7 @@ export async function DELETE(
     }
 
     // Solo el profesor del curso o un Super Admin puede eliminar recursos de clase
-    if (course.instructorId !== session.user.id && !session.user.isSuperAdmin) {
+    if (course.profesorId !== session.user.id && !session.user.isSuperAdmin) {
       return new NextResponse('Forbidden', { status: 403 });
     }
 
