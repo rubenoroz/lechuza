@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useCustomSession } from '@/hooks/useCustomSession'; // Importar el custom hook
 
 export default function CreateCoursePage() {
-  const { data: session } = useSession();
+  const { data: session } = useCustomSession(); // Usar el custom hook
   const router = useRouter();
 
   const [titulo, setTitulo] = useState('');
@@ -47,8 +47,7 @@ export default function CreateCoursePage() {
       };
       fetchProfesores();
     }
-  }, [session, isInstructorUser]);
-
+  }, [session, isProfesorUser]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
