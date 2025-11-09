@@ -40,15 +40,15 @@ export async function POST(request: Request) {
     } = await request.json();
 
     // If user is an instructor but not a super admin, they can only create courses for themselves
-    if (session.user?.isProfesor && !session.user?.isSuperAdmin && profesorId !== session.user.id) {
+    if (user?.isProfesor && !user?.isSuperAdmin && profesorId !== user.id) {
       return NextResponse.json({ message: 'Unauthorized: Profesores solo pueden crear cursos para ellos mismos.' }, { status: 403 });
     }
 
     // Determine 'activo' status based on user role
     let courseActivo = activo;
-    if (session.user?.isProfesor && !session.user?.isSuperAdmin) {
+    if (user?.isProfesor && !user?.isSuperAdmin) {
       courseActivo = false; // Profesores crean cursos como inactivos (borrador)
-    } else if (session.user?.isSuperAdmin && activo === undefined) {
+    } else if (user?.isSuperAdmin && activo === undefined) {
       courseActivo = true; // Super admin defaults to active if not specified
     }
 
