@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: { courseId: string, moduleId: string } }
+  { params }: { params: Promise<{ courseId: string, moduleId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,8 +14,7 @@ export async function GET(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const resolvedParams = await params;
-    const { courseId, moduleId } = resolvedParams;
+    const { courseId, moduleId } = await params;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
@@ -49,15 +48,14 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { courseId: string, moduleId: string } }
+  { params }: { params: Promise<{ courseId: string, moduleId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const resolvedParams = await params;
-    const { courseId, moduleId } = resolvedParams;
+    const { courseId, moduleId } = await params;
 
     console.log('POST Class - Session:', session);
     console.log('POST Class - Session User:', session?.user);
@@ -130,7 +128,7 @@ export async function POST(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { courseId: string, moduleId: string, classId: string } }
+  { params }: { params: Promise<{ courseId: string, moduleId: string, classId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -149,8 +147,7 @@ export async function PUT(
       return NextResponse.json({ message: 'For video content, either a video URL or a video file path is required' }, { status: 400 });
     }
 
-    const resolvedParams = await params;
-    const { courseId, moduleId, classId } = resolvedParams;
+    const { courseId, moduleId, classId } = await params;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
@@ -194,7 +191,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { courseId: string, moduleId: string, classId: string } }
+  { params }: { params: Promise<{ courseId: string, moduleId: string, classId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -203,8 +200,7 @@ export async function DELETE(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const resolvedParams = await params;
-    const { courseId, moduleId, classId } = resolvedParams;
+    const { courseId, moduleId, classId } = await params;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
