@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 // POST - Crear una nueva opción para una pregunta
 export async function POST(
   request: Request,
-  { params }: { params: { questionId: string } }
+  { params }: { params: Promise<{ questionId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -17,8 +17,7 @@ export async function POST(
   try {
     const body = await request.json();
     const { texto, es_correcta } = body;
-    const resolvedParams = await params;
-    const { questionId } = resolvedParams;
+    const { questionId } = await params;
 
     if (texto === undefined || es_correcta === undefined) {
       return new NextResponse('Option text and correctness status are required', { status: 400 });
