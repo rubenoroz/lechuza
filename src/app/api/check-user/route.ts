@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     } else {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to check user.' }, { status: 500 });
+  } catch (error: any) {
+    return new Response(`Failed to check user: ${error.message}`, { status: 500 });
   }
 }
