@@ -9,7 +9,7 @@ declare module 'next-auth' {
     id: string;
     isSuperAdmin?: boolean;
     isEnrollmentAdmin?: boolean;
-    isInstructor?: boolean;
+    isProfesor?: boolean;
     isStudent?: boolean;
   }
 
@@ -21,7 +21,7 @@ declare module 'next-auth' {
       id: string;
       isSuperAdmin?: boolean;
       isEnrollmentAdmin?: boolean;
-      isInstructor?: boolean;
+      isProfesor?: boolean;
       isStudent?: boolean;
       name?: string | null;
       email?: string | null;
@@ -36,7 +36,7 @@ declare module 'next-auth/jwt' {
     id: string;
     isSuperAdmin?: boolean;
     isEnrollmentAdmin?: boolean;
-    isInstructor?: boolean;
+    isProfesor?: boolean;
     isStudent?: boolean;
   }
 }
