@@ -13,7 +13,7 @@ interface CustomSessionUser {
 }
 
 interface CustomSession extends Session {
-  user?: CustomSessionUser;
+  user: CustomSessionUser;
 }
 
 export const useCustomSession = () => {
