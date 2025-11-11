@@ -23,7 +23,7 @@ export default function CreateCoursePage() {
   const [instructors, setInstructors] = useState([]);
   const [error, setError] = useState('');
 
-  const isInstructorUser = session?.user?.isInstructor && !session?.user?.isSuperAdmin;
+  const isInstructorUser = session?.user?.isProfesor && !session?.user?.isSuperAdmin;
   const canEditActivo = session?.user?.isSuperAdmin; // Only Super Admins can edit activo
 
   useEffect(() => {
