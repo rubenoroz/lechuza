@@ -1,0 +1,9 @@
+{
+  "jobs": [
+    {
+      "name": "Prisma Migrate",
+      "command": "prisma migrate deploy",
+      "schedule": "@once"
+    }
+  ]
+}
