@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ courseId: string, resourceId: string }> }
+  { params }: { params: { courseId: string, resourceId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -20,11 +20,11 @@ export async function PUT(
       return new NextResponse('Name, type, and either URL or filePath are required', { status: 400 });
     }
 
-    const { courseId, resourceId } = await params;
+    const { courseId, resourceId } = params;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
-      select: { instructorId: true, activo: true }
+      select: { profesorId: true, activo: true }
     });
 
     if (!course) {
@@ -32,7 +32,7 @@ export async function PUT(
     }
 
     // Solo el profesor del curso o un Super Admin puede actualizar recursos generales
-    if (course.instructorId !== session.user.id && !session.user.isSuperAdmin) {
+    if (course.profesorId !== session.user.id && !session.user.isSuperAdmin) {
       return new NextResponse('Forbidden', { status: 403 });
     }
 
@@ -55,7 +55,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ courseId: string, resourceId: string }> }
+  { params }: { params: { courseId: string, resourceId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -64,11 +64,11 @@ export async function DELETE(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { courseId, resourceId } = await params;
+    const { courseId, resourceId } = params;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
-      select: { instructorId: true, activo: true }
+      select: { profesorId: true, activo: true }
     });
 
     if (!course) {
@@ -76,7 +76,7 @@ export async function DELETE(
     }
 
     // Solo el profesor del curso o un Super Admin puede eliminar recursos generales
-    if (course.instructorId !== session.user.id && !session.user.isSuperAdmin) {
+    if (course.profesorId !== session.user.id && !session.user.isSuperAdmin) {
       return new NextResponse('Forbidden', { status: 403 });
     }
 
