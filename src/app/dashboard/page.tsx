@@ -39,7 +39,7 @@ export default function DashboardPage() {
               Mis Cursos como Alumno
             </Link>
           )}
-          {session?.user?.isInstructor && (
+          {session?.user?.isProfesor && (
             <Link href="/instructor/dashboard" className="block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
               Mis Cursos como Instructor
             </Link>
