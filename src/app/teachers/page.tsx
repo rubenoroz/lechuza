@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function getTeachers() {
   const teachers = await prisma.user.findMany({
-    where: { role: 'INSTRUCTOR' },
+    where: { isProfesor: true },
   });
   return teachers;
 }
