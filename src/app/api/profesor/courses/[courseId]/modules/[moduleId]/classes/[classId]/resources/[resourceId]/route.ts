@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 export async function PUT(
   request: Request,
-  context: { params: { courseId: string, moduleId: string, classId: string, resourceId: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -55,7 +55,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: { courseId: string, moduleId: string, classId: string, resourceId: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions);
