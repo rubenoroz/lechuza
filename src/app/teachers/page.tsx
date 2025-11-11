@@ -26,9 +26,9 @@ export default async function TeachersPage() {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {teachers.map((teacher) => (
               <div key={teacher.id} className="flex flex-col items-center text-center">
-                <img className="w-32 h-32 rounded-full object-cover" src={teacher.image || 'https://via.placeholder.com/150'} alt={`${teacher.nombres} ${teacher.apellido_paterno}`} />
+                <img className="w-32 h-32 rounded-full object-cover" src={teacher.foto_perfil || 'https://via.placeholder.com/150'} alt={`${teacher.nombres} ${teacher.apellido_paterno}`} />
                 <h3 className="mt-4 text-xl font-semibold text-gray-900">{`${teacher.nombres} ${teacher.apellido_paterno} ${teacher.apellido_materno}`}</h3>
-                <p className="mt-2 text-base text-gray-500">{teacher.bio}</p>
+                <p className="mt-2 text-base text-gray-500">{teacher.biografia}</p>
               </div>
             ))}
           </div>
