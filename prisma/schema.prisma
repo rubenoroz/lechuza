@@ -41,7 +41,7 @@ model User {
   enrollmentRequests EnrollmentRequest[]
 
   // Para el progreso del curso (JSON)
-  progreso_cursos Json? // { "curso_slug": { "modulo_1": ["clase_1_1"], ... } }
+  progreso_cursos String? // { "curso_slug": { "modulo_1": ["clase_1_1"], ... } }
 
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
@@ -58,9 +58,9 @@ model Course {
   descripcion_larga  String
   imagen_portada     String?
   video_presentacion String?
-  modalidad          Modalidad
-  nivel              Nivel
-  publico_objetivo   PublicoObjetivo
+  modalidad          String
+  nivel              String
+  publico_objetivo   String
   precio             Float
   activo             Boolean    @default(true)
 
@@ -76,26 +76,6 @@ model Course {
 
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
-}
-
-enum Modalidad {
-  OnlineGrabado
-  OnlineEnVivo
-  Presencial
-  Hibrido
-  CapacitacionEmpresas
-}
-
-enum Nivel {
-  Basico
-  Intermedio
-  Avanzado
-}
-
-enum PublicoObjetivo {
-  Profesionales
-  Ninos
-  General
 }
 
 // Modelo de Módulo (relacionado con Curso)
@@ -117,7 +97,7 @@ model Module {
 model Class {
   id               String         @id @default(cuid())
   titulo           String
-  tipo_contenido   TipoContenido
+  tipo_contenido   String
   contenido_video   String? // URL del video (ej. YouTube, Vimeo)
   videoFilePath     String? // Ruta al archivo de video subido localmente
   videoMimeType     String? // Tipo MIME del archivo de video
@@ -137,13 +117,6 @@ model Class {
 
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
-}
-
-enum TipoContenido {
-  Video
-  Texto
-  Quiz
-  Ejercicio
 }
 
 // Modelo Ejercicio (ahora es un modelo regular)
@@ -233,19 +206,13 @@ model Enrollment {
   updatedAt DateTime @updatedAt
 }
 
-enum EnrollmentStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
 model EnrollmentRequest {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseId  String
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  status    EnrollmentStatus @default(PENDING)
+  status    String @default("PENDING")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -268,9 +235,9 @@ model CourseDraft {
   descripcion_larga  String
   imagen_portada     String?
   video_presentacion String?
-  modalidad          Modalidad
-  nivel              Nivel
-  publico_objetivo   PublicoObjetivo
+  modalidad          String
+  nivel              String
+  publico_objetivo   String
   precio             Float
   
   isPendingReview    Boolean    @default(true) // Indica si el borrador está pendiente de revisión
